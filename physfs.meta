@@ -1,0 +1,5 @@
+((license "BSD")
+ (category "io")
+ (author "Daniel J. Leslie")
+ (needs bind miscmacros)
+ (synposis "Scheme-friendly bindings to Ryan C. Gordon's PhysicsFS."))

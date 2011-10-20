@@ -1,0 +1,9 @@
+(compile -s -O2 -d1 physfs.scm -j physfs -lphysfs)
+(compile -s physfs.import.scm -O2 -d0)
+(compile -c -O2 -d1 physfs.scm -unit physfs -j physfs)
+
+(install-extension
+ 'physfs
+ '("physfs.so" "physfs.o" "physfs.import.so")
+ '((version 0.1)
+   (static "physfs.o")))
