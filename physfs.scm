@@ -20,26 +20,36 @@ typedef signed short          PHYSFS_sint16;
 typedef unsigned int          PHYSFS_uint32;
 typedef signed int            PHYSFS_sint32;
 
-extern struct PHYSFS_Allocator;
-
 typedef struct PHYSFS_File
 {
     void *opaque;
 } PHYSFS_File;
 
 extern void PHYSFS_permitSymbolicLinks(bool allow);
-extern int PHYSFS_deinit();
-extern int PHYSFS_setWriteDir(const char *newDir);
-extern int PHYSFS_removeFromSearchPath(const char *oldDir);
-extern int PHYSFS_mkdir(const char *dirName);
-extern int PHYSFS_delete(const char *filename);
-extern int PHYSFS_exists(const char *fname);
-extern int PHYSFS_isDirectory(const char *fname);
-extern int PHYSFS_isSymbolicLink(const char *fname);
-extern int PHYSFS_close(PHYSFS_File *handle);
-extern int PHYSFS_eof(PHYSFS_File *handle);
-extern int PHYSFS_flush(PHYSFS_File *handle);
-extern const char *PHYSFS_getLastError();
+extern bool PHYSFS_deinit();
+extern bool PHYSFS_setWriteDir(const char *newDir);
+extern bool PHYSFS_removeFromSearchPath(const char *oldDir);
+extern bool PHYSFS_mkdir(const char *dirName);
+extern bool PHYSFS_delete(const char *filename);
+extern bool PHYSFS_exists(const char *fname);
+extern bool PHYSFS_isDirectory(const char *fname);
+extern bool PHYSFS_isSymbolicLink(const char *fname);
+extern bool PHYSFS_close(PHYSFS_File *handle);
+extern bool PHYSFS_eof(PHYSFS_File *handle);
+extern bool PHYSFS_flush(PHYSFS_File *handle);
+extern bool PHYSFS_setSaneConfig(const char *organization, const char *appName, const char *archiveExt, bool includeCdRoms, bool archivesFirst);
+extern bool PHYSFS_addToSearchPath(const char *newDir, bool appendToPath);
+extern bool PHYSFS_writeSLE16(PHYSFS_File *file, PHYSFS_sint16 val);
+extern bool PHYSFS_writeULE16(PHYSFS_File *file, PHYSFS_uint16 val);
+extern bool PHYSFS_writeSBE16(PHYSFS_File *file, PHYSFS_sint16 val);
+extern bool PHYSFS_writeUBE16(PHYSFS_File *file, PHYSFS_uint16 val);
+extern bool PHYSFS_writeSLE32(PHYSFS_File *file, PHYSFS_sint32 val);
+extern bool PHYSFS_writeULE32(PHYSFS_File *file, PHYSFS_uint32 val);
+extern bool PHYSFS_writeSBE32(PHYSFS_File *file, PHYSFS_sint32 val);
+extern bool PHYSFS_writeUBE32(PHYSFS_File *file, PHYSFS_uint32 val);
+extern bool PHYSFS_isInit();
+extern bool PHYSFS_symbolicLinksPermitted();
+extern bool PHYSFS_mount(const char *newDir, const char *mountPoint, bool appendToPath);
 extern const char *PHYSFS_getDirSeparator();
 extern const char *PHYSFS_getBaseDir();
 extern const char *PHYSFS_getUserDir();
@@ -48,8 +58,6 @@ extern const char *PHYSFS_getRealDir(const char *filename);
 extern PHYSFS_File *PHYSFS_openWrite(const char *filename);
 extern PHYSFS_File *PHYSFS_openAppend(const char *filename);
 extern PHYSFS_File *PHYSFS_openRead(const char *filename);
-extern int PHYSFS_setSaneConfig(const char *organization, const char *appName, const char *archiveExt, int includeCdRoms, int archivesFirst);
-extern int PHYSFS_addToSearchPath(const char *newDir, int appendToPath);
 extern PHYSFS_sint16 PHYSFS_swapSLE16(PHYSFS_sint16 val);
 extern PHYSFS_uint16 PHYSFS_swapULE16(PHYSFS_uint16 val);
 extern PHYSFS_sint32 PHYSFS_swapSLE32(PHYSFS_sint32 val);
@@ -58,30 +66,20 @@ extern PHYSFS_sint16 PHYSFS_swapSBE16(PHYSFS_sint16 val);
 extern PHYSFS_uint16 PHYSFS_swapUBE16(PHYSFS_uint16 val);
 extern PHYSFS_sint32 PHYSFS_swapSBE32(PHYSFS_sint32 val);
 extern PHYSFS_uint32 PHYSFS_swapUBE32(PHYSFS_uint32 val);
-extern int PHYSFS_writeSLE16(PHYSFS_File *file, PHYSFS_sint16 val);
-extern int PHYSFS_writeULE16(PHYSFS_File *file, PHYSFS_uint16 val);
-extern int PHYSFS_writeSBE16(PHYSFS_File *file, PHYSFS_sint16 val);
-extern int PHYSFS_writeUBE16(PHYSFS_File *file, PHYSFS_uint16 val);
-extern int PHYSFS_writeSLE32(PHYSFS_File *file, PHYSFS_sint32 val);
-extern int PHYSFS_writeULE32(PHYSFS_File *file, PHYSFS_uint32 val);
-extern int PHYSFS_writeSBE32(PHYSFS_File *file, PHYSFS_sint32 val);
-extern int PHYSFS_writeUBE32(PHYSFS_File *file, PHYSFS_uint32 val);
-extern int PHYSFS_isInit();
-extern int PHYSFS_symbolicLinksPermitted();
-extern int PHYSFS_mount(const char *newDir, const char *mountPoint, int appendToPath);
 extern const char *PHYSFS_getMountPoint(const char *dir);
-extern int PHYSFS_setAllocator(const PHYSFS_Allocator *allocator);
 #endif
 
+#ifdef CHICKEN
+bool init();
+#else
 int init()
 {
-#ifndef CHICKEN
     if (C_main_argv != NULL)
 	return PHYSFS_init(C_main_argv[0]);
     else
 	return PHYSFS_init(NULL);
-#endif
 }
+#endif
 
 ENDC
 )
@@ -116,6 +114,9 @@ ENDC
                                 C_return(version.patch);")))
     (make-Version (major) (minor) (patch))))
 
+
+(define getLastError (foreign-lambda nonnull-c-string "getLastError"))
+
 (define supportedArchiveTypes
   (letrec ((data-ptr (foreign-value "PHYSFS_supportedArchiveTypes()" (c-pointer c-pointer)))
            (finished? (foreign-lambda* bool (((c-pointer c-pointer) ptr))
@@ -146,63 +147,87 @@ ENDC
 
 (define readSLE16 (foreign-lambda* short (((c-pointer File) file))
                                           "PHYSFS_sint16 val = 0;
-                                           PHYSFS_readSLE16(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readSLE16(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define readULE16 (foreign-lambda* unsigned-short (((c-pointer File) file))
                                           "PHYSFS_uint16 val = 0;
-                                           PHYSFS_readULE16(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readULE16(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define readSBE16 (foreign-lambda* short (((c-pointer File) file))
                                           "PHYSFS_sint16 val = 0;
-                                           PHYSFS_readSBE16(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readSBE16(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define readUBE16 (foreign-lambda* unsigned-short (((c-pointer File) file))
                                           "PHYSFS_uint16 val = 0;
-                                           PHYSFS_readUBE16(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readUBE16(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define readSLE32 (foreign-lambda* integer32 (((c-pointer File) file))
                                           "PHYSFS_sint32 val = 0;
-                                           PHYSFS_readSLE32(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readSLE32(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define readULE32 (foreign-lambda* unsigned-integer32 (((c-pointer File) file))
                                           "PHYSFS_uint32 val = 0;
-                                           PHYSFS_readULE32(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readULE32(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define readSBE32 (foreign-lambda* integer32 (((c-pointer File) file))
                                           "PHYSFS_sint32 val = 0;
-                                           PHYSFS_readSBE32(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readSBE32(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define readUBE32 (foreign-lambda* unsigned-integer32 (((c-pointer File) file))
                                           "PHYSFS_uint32 val = 0;
-                                           PHYSFS_readUBE32(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readUBE32(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define readSLE64 (foreign-lambda* integer64 (((c-pointer File) file))
                                           "PHYSFS_sint64 val = 0;
-                                           PHYSFS_readSLE64(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readSLE64(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define readULE64 (foreign-lambda* unsigned-integer64 (((c-pointer File) file))
                                           "PHYSFS_uint64 val = 0;
-                                           PHYSFS_readULE64(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readULE64(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define readSBE64 (foreign-lambda* integer64 (((c-pointer File) file))
                                           "PHYSFS_sint64 val = 0;
-                                           PHYSFS_readSBE64(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readSBE64(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define readUBE64 (foreign-lambda* integer64 (((c-pointer File) file))
                                           "PHYSFS_uint64 val = 0;
-                                           PHYSFS_readUBE64(file, &val);
-                                           C_return(val);"))
+                                           if (0 != PHYSFS_readUBE64(file, &val))
+                                             C_return(val);
+                                           else
+                                             C_return(C_SCHEME_FALSE);"))
 
 (define writeSLE64 (foreign-lambda integer "PHYSFS_writeSLE64" (c-pointer File) integer64))
 
@@ -261,11 +286,4 @@ ENDC
                                                "char *dst = (char *)C_alloc(sizeof(char) * len);
                                               PHYSFS_utf8FromLatin1((char *)src, dst, len);;
                                               C_return(dst);"))
-
-;; typedef void (*PHYSFS_StringCallback)(void *data, const char *str)
-;; typedef void (*PHYSFS_EnumFilesCallback)(void *data, const char *origdir, const char *fname)
-;; extern void PHYSFS_getCdRomDirsCallback(PHYSFS_StringCallback c, void *d)
-;; extern void PHYSFS_enumerateFilesCallback(const char *dir, PHYSFS_EnumFilesCallback c, void *d)
-;; extern void PHYSFS_getSearchPathCallback(PHYSFS_StringCallback c, void *d)
-
 )
