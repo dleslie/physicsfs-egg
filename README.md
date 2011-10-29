@@ -33,7 +33,7 @@ Once the search path is defined, you may open files for reading. If you've got t
  *  D:\\mygamescdromdatafiles
  *  C:\\mygame\\installeddatafiles.zip
 
-Then a call to physfs#openRead("textfiles/myfile.txt") (note the directory separator, lack of drive letter, and lack of dir separator at the start of the string; this is platform-independent notation) will check for
+Then a call to (openRead "textfiles/myfile.txt") (note the directory separator, lack of drive letter, and lack of dir separator at the start of the string; this is platform-independent notation) will check for
 
  *  C:\\mygame\\textfiles\\myfile.txt, then
  *  C:\\mygame\\myuserfiles\\textfiles\\myfile.txt, then
@@ -42,19 +42,19 @@ Then a call to physfs#openRead("textfiles/myfile.txt") (note the directory separ
 
 Remember that most archive types and platform filesystems store their filenames in a case-sensitive manner, so you should be careful to specify it correctly.
 
-Files opened through PhysicsFS may NOT contain "." or ".." or ":" as dir elements. Not only are these meaningless on MacOS Classic and/or Unix, they are a security hole. Also, symbolic links (which can be found in some archive types and directly in the filesystem on Unix platforms) are NOT followed until you call physfs#permitSymbolicLinks. That's left to your own discretion, as following a symlink can allow for access outside the write dir and search paths. For portability, there is no mechanism for creating new symlinks in PhysicsFS.
+Files opened through PhysicsFS may NOT contain "." or ".." or ":" as dir elements. Not only are these meaningless on MacOS Classic and/or Unix, they are a security hole. Also, symbolic links (which can be found in some archive types and directly in the filesystem on Unix platforms) are NOT followed until you call (permitSymbolicLinks #t). That's left to your own discretion, as following a symlink can allow for access outside the write dir and search paths. For portability, there is no mechanism for creating new symlinks in PhysicsFS.
 
 The write dir is not included in the search path unless you specifically add it. While you CAN change the write dir as many times as you like, you should probably set it once and stick to it. Remember that your program will not have permission to write in every directory on Unix and NT systems.
 
 All files are opened in binary mode; there is no endline conversion for textfiles. Other than that, PhysicsFS has some convenience functions for platform-independence. There is a function to tell you the current platform's dir separator ("\\" on windows, "/" on Unix, ":" on MacOS), which is needed only to set up your search/write paths. There is a function to tell you what CD-ROM drives contain accessible discs, and a function to recommend a good search path, etc.
 
-A recommended order for the search path is the write dir, then the base dir, then the cdrom dir, then any archives discovered. Quake 3 does something like this, but moves the archives to the start of the search path. Build Engine games, like Duke Nukem 3D and Blood, place the archives last, and use the base dir for both searching and writing. There is a helper function physfs#setSaneConfig that puts together a basic configuration for you, based on a few parameters. Also see the comments on physfs#getBaseDir, and physfs#getUserDir for info on what those are and how they can help you determine an optimal search path.
+A recommended order for the search path is the write dir, then the base dir, then the cdrom dir, then any archives discovered. Quake 3 does something like this, but moves the archives to the start of the search path. Build Engine games, like Duke Nukem 3D and Blood, place the archives last, and use the base dir for both searching and writing. There is a helper function (setSaneConfig) that puts together a basic configuration for you, based on a few parameters. Also see the comments on (getBaseDir), and (getUserDir) for info on what those are and how they can help you determine an optimal search path.
 
 PhysicsFS 2.0 adds the concept of "mounting" archives to arbitrary points in the search path. If a zipfile contains "maps/level.map" and you mount that archive at "mods/mymod", then you would have to open "mods/mymod/maps/level.map" to access the file, even though "mods/mymod" isn't actually specified in the .zip file. Unlike the Unix mentality of mounting a filesystem, "mods/mymod" doesn't actually have to exist when mounting the zipfile. It's a "virtual" directory. The mounting mechanism allows the developer to seperate archives in the tree and avoid trampling over files when added new archives, such as including mod support in a game...keeping external content on a tight leash in this manner can be of utmost importance to some applications.
 
-PhysicsFS is mostly thread safe. The error messages returned by physfs#getLastError are unique by thread, and library-state-setting functions are mutex'd. For efficiency, individual file accesses are not locked, so you can not safely read/write/seek/close/etc the same  file from two threads at the same time. Other race conditions are bugs  that should be reported/patched.
+PhysicsFS is mostly thread safe. The error messages returned by (getLastError) are unique by thread, and library-state-setting functions are mutex'd. For efficiency, individual file accesses are not locked, so you can not safely read/write/seek/close/etc the same  file from two threads at the same time. Other race conditions are bugs  that should be reported/patched.
 
-While you CAN use stdio/syscall file access in a program that has physfs#* calls, doing so is not recommended, and you can not use system filehandles with PhysicsFS and vice versa.
+While you CAN use stdio/syscall file access in a program that has physfs calls, doing so is not recommended, and you can not use system filehandles with PhysicsFS and vice versa.
 
 Note that archives need not be named as such: if you have a ZIP file and rename it with a .PKG extension, the file will still be recognized as a ZIP archive by PhysicsFS; the file's contents are used to determine its type where possible.
 
@@ -70,7 +70,7 @@ String policy for PhysicsFS 2.0 and later:
 
 PhysicsFS 1.0 could only deal with null-terminated ASCII strings. All high ASCII chars resulted in undefined behaviour, and there was no Unicode support at all. PhysicsFS 2.0 supports Unicode without breaking binary compatibility with the 1.0 API by using UTF-8 encoding of all strings passed in and out of the library.
 
-All strings passed through PhysicsFS are in null-terminated UTF-8 format. This means that if all you care about is English (ASCII characters <= 127) then you just use regular C strings. If you care about Unicode (and you should!) then you need to figure out what your platform wants, needs, and offers. If you are on Windows and build with Unicode support, your TCHAR strings are two bytes per character (this is called "UCS-2 encoding"). You should convert them to UTF-8 before handing them to PhysicsFS with  physfs#utf8FromUcs2. If you're using Unix or Mac OS X, your wchar_t strings are four bytes per character ("UCS-4 encoding"). Use physfs#utf8FromUcs4. Mac OS X can give you UTF-8 directly from a CFString, and many Unixes generally give you C strings in UTF-8 format everywhere. If you have a single-byte high ASCII charset, like so-many European "codepages" you may be out of luck. We'll convert from "Latin1" to UTF-8 only, and never back to Latin1. If you're above ASCII 127, all bets are off: move to Unicode or use your platform's facilities. Passing a C string with high-ASCII data that isn't UTF-8 encoded will NOT do what you expect!
+All strings passed through PhysicsFS are in null-terminated UTF-8 format. This means that if all you care about is English (ASCII characters <= 127) then you just use regular C strings. If you care about Unicode (and you should!) then you need to figure out what your platform wants, needs, and offers. If you are on Windows and build with Unicode support, your TCHAR strings are two bytes per character (this is called "UCS-2 encoding"). You should convert them to UTF-8 before handing them to PhysicsFS with (utf8FromUcs2). If you're using Unix or Mac OS X, your wchar_t strings are four bytes per character ("UCS-4 encoding"). Use (utf8FromUcs4). Mac OS X can give you UTF-8 directly from a CFString, and many Unixes generally give you C strings in UTF-8 format everywhere. If you have a single-byte high ASCII charset, like so-many European "codepages" you may be out of luck. We'll convert from "Latin1" to UTF-8 only, and never back to Latin1. If you're above ASCII 127, all bets are off: move to Unicode or use your platform's facilities. Passing a C string with high-ASCII data that isn't UTF-8 encoded will NOT do what you expect!
 
 Naturally, there's also (utf8ToUcs2) and (utf8ToUcs4) to get data back into a format you like. Behind the scenes, PhysicsFS will use Unicode where possible: the UTF-8 strings on Windows will be converted and used with the multibyte Windows APIs, for example.
 
@@ -166,8 +166,7 @@ Symbolic link permission can be enabled or disabled at any time after you've cal
 
 ; (getCdRomDirs) : Get an array of paths to available CD-ROM drives.
 
-The dirs returned are platform-dependent ("D:\" on Win32, "/cdrom" or whatnot on Unix). Dirs are only returned if there is a disc ready and
- accessible in the drive. So if you've got two drives (D: and E:), and only E: has a disc in it, then that's all you get. If the user inserts a disc in D: and you call this function again, you get both drives. If, on a Unix box, the user unmounts a disc and remounts it elsewhere, the next call to this function will reflect that change.
+The dirs returned are platform-dependent ("D:\" on Win32, "/cdrom" or whatnot on Unix). Dirs are only returned if there is a disc ready and accessible in the drive. So if you've got two drives (D: and E:), and only E: has a disc in it, then that's all you get. If the user inserts a disc in D: and you call this function again, you get both drives. If, on a Unix box, the user unmounts a disc and remounts it elsewhere, the next call to this function will reflect that change.
 
 This function refers to "CD-ROM" media, but it really means "inserted disc media," such as DVD-ROM, HD-DVD, CDRW, and Blu-Ray discs. It looks for filesystems, and as such won't report an audio CD, unless there's a mounted filesystem track on it.
 
@@ -185,8 +184,7 @@ You should probably use the base dir in your search path.
 
 Helper function.
 
-Get the "user dir". This is meant to be a suggestion of where a specific user of the system can store files. On Unix, this is her home directory. On systems with no concept of multiple home directories (MacOS, win95), this will default to something like "C:\mybasedir\users\username"
- where "username" will either be the login name, or "default" if the platform doesn't support multiple users, either.
+Get the "user dir". This is meant to be a suggestion of where a specific user of the system can store files. On Unix, this is her home directory. On systems with no concept of multiple home directories (MacOS, win95), this will default to something like "C:\mybasedir\users\username" where "username" will either be the login name, or "default" if the platform doesn't support multiple users, either.
 
 You should probably use the user dir as the basis for your write dir, and also put it near the beginning of your search path.
 
@@ -319,8 +317,7 @@ Note that entries that are symlinks are ignored if (permitSymbolicLinks #t) hasn
 
 ; (close handle) : Close a PhysicsFS filehandle.
 
-This call is capable of failing if the operating system was buffering writes to the physical media, and, now forced to write those changes to
- physical media, can not store the data for some reason. In such a case, the filehandle stays open. A well-written program should ALWAYS check the return value from the close call in addition to every writing call!
+This call is capable of failing if the operating system was buffering writes to the physical media, and, now forced to write those changes to physical media, can not store the data for some reason. In such a case, the filehandle stays open. A well-written program should ALWAYS check the return value from the close call in addition to every writing call!
 
 ; (read handle buffer objSize objCount) : Read data from a PhysicsFS filehandle
 
