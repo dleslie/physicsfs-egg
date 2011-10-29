@@ -2,5 +2,5 @@
  (category io)
  (author "Daniel J. Leslie")
  (needs bind miscmacros)
- (doc-from-wiki)
- (synposis "Scheme-friendly bindings to Ryan C. Gordon's PhysicsFS."))
+ (synopsis "Comprehensive library for transparently interfacing with archives and file systems of various formats and endian-ness")
+ (doc-from-wiki))

@@ -1,3 +1,3 @@
 (repo git "git@github.com:dleslie/physicsfs-egg.git")
 (uri targz "https://github.com/dleslie/physicsfs-egg/tarball/master")
-(release "0.1")
+(release "1.0")
