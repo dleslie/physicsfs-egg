@@ -1,5 +1,5 @@
 ((license "BSD")
- (category "io")
+ (category io)
  (author "Daniel J. Leslie")
  (needs bind miscmacros)
  (doc-from-wiki)
