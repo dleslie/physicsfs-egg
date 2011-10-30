@@ -237,8 +237,7 @@ All of this can be accomplished from the application, but this just does it all 
 
 ; (mkdir dirName) : Create a directory.
 
-This is specified in platform-independent notation in relation to the write dir. All missing parent directories are also created if they
- don't exist.
+This is specified in platform-independent notation in relation to the write dir. All missing parent directories are also created if they don't exist.
 
 So if you've got the write dir set to "C:\mygame\writedir" and call (mkdir "downloads/maps") then the directories "C:\mygame\writedir\downloads" and "C:\mygame\writedir\downloads\maps" will be created if possible. If the creation of "maps" fails after we have successfully created "downloads", then the function leaves the created directory behind and reports failure.
 
@@ -258,8 +257,7 @@ Chances are, the bits that make up the file still exist, they are just made avai
 
 ; (getRealDir filename) : Figure out where in the search path a file resides.
 
-The file is specified in platform-independent notation. The returned filename will be the element of the search path where the file was found,
- which may be a directory, or an archive. Even if there are multiple matches in different parts of the search path, only the first one found is used, just like when opening a file.
+The file is specified in platform-independent notation. The returned filename will be the element of the search path where the file was found, which may be a directory, or an archive. Even if there are multiple matches in different parts of the search path, only the first one found is used, just like when opening a file.
 
 So, if you look for "maps/level1.map", and C:\\mygame is in your search path and C:\\mygame\\maps\\level1.map exists, then "C:\mygame" is returned.
 
