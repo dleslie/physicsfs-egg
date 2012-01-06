@@ -732,6 +732,24 @@ Latin1 strings are 8-bits per character: a popular "high ASCII" encoding.
 
 Please note that we do not supply a UTF-8 to Latin1 converter, since Latin1 can't express most Unicode codepoints. It's a legacy encoding; you should be converting away from it at all times.
 
+=== Convenience Functions
+
+==== <procedure>(read-from-file file-name)</procedure>
+
+Assuming that PhysicsFS has been initialized and that a location has been mounted, this function will read an entire file into a <type>blob</type>.
+
+Throws errors if the parameter is not a string, or if the declared file name cannot be found, or if PhysicsFS is not initialized.
+
+==== <procedure>(write-to-file file-name data)</procedure>
+
+Assuming that PhysicsFS has been initialized and that a mount point is available; given a file name and a <type>blob</type> this function will write the entire contents of the blob to the file.
+
+Throws errors if the parameters are incorrect, or if PhysicsFS is not initialized.
+
+== Known Issues
+
+* 64-bit return values for foreign bindings are not supported by Chicken at the moment, and as such the read-foo64 bindings, and others, aren't actually available.
+
 == Author
 
 Dan Leslie (dan@ironoxide.ca)

@@ -465,6 +465,8 @@ ENDC
 (define file-opaque File-opaque)
 
 (define (read-from-file file-name)
+  (if (not (init?))
+      (error "PhysicsFS must be initialized"))
   (if (not (string? file-name))
       (error "file-name must be a string"))
   (if (not (exists file-name))
@@ -483,6 +485,8 @@ ENDC
           #f))))
 
 (define (write-to-file file-name data)
+  (if (not (init?))
+      (error "PhysicsFS must be initialized"))
   (if (not (string? file-name))
       (error "file-name must be a string"))
   (if (not (blob? data))
