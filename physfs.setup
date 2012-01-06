@@ -5,5 +5,5 @@
 (install-extension
  'physfs
  '("physfs.so" "physfs.o" "physfs.import.so")
- '((version 1.0)
+ '((version 2.0)
    (static "physfs.o")))

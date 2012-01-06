@@ -1,9 +1,102 @@
-(module physfs *
+(module physfs 
+        (archive-info?
+         archive-info-author
+         archive-info-author-set!
+         archive-info-description
+         archive-info-description-set!
+         archive-info-extension
+         archive-info-extension-set!
+         archive-info-url
+         archive-info-url-set!
+         add-to-search-path
+         close
+         deinit
+         delete
+         directory?
+         enumerate-files
+         eof
+         exists
+         file-length
+         file-opaque
+         flush
+         get-base-dir
+         get-cdrom-dirs
+         get-dir-separator
+         get-last-error
+         get-last-mod-time
+         get-mount-point
+         get-real-dir
+         get-search-path
+         get-user-dir
+         get-write-dir
+         init
+         init?
+         linked-version
+         make-archive-info
+         make-version
+         mkdir
+         mount
+         open-append
+         open-read
+         open-write
+         permit-symbolic-links
+         read-from-file
+         read-sbe16
+         read-sbe32
+         read-sle16
+         read-sle32
+         read-ube16
+         read-ube32
+         read-ule16
+         read-ule32
+         remove-from-search-path
+         seek
+         set-buffer
+         set-sane-config
+         set-write-dir
+         supported-archive-types
+         swap-sbe16
+         swap-sbe32
+         swap-sbe64
+         swap-sle16
+         swap-sle32
+         swap-sle64
+         swap-ube16
+         swap-ube32
+         swap-ube64
+         swap-ule16
+         swap-ule32
+         swap-ule64
+         symbolic-link?
+         symbolic-links-permitted
+         tell
+         utf8-from-latin1
+         utf8-from-ucs2
+         utf8-from-ucs4
+         utf8-to-ucs2
+         utf8-to-ucs4
+         version?
+         version-major
+         version-minor
+         version-patch
+         write-sbe16
+         write-sbe32
+         write-sbe64
+         write-sle16
+         write-sle32
+         write-sle64
+         write-to-file
+         write-ube16
+         write-ube32
+         write-ube64
+         write-ule16
+         write-ule32
+         write-ule64)
 
-  (import chicken scheme foreign bind miscmacros)
+        (import chicken scheme foreign bind miscmacros)
 
-  (bind-options export-constants: #t prefix: "")
-  (bind-rename/pattern "PHYSFS_" "")
+        (bind-options export-constants: #t prefix: "")
+        (bind-rename/pattern "PHYSFS_" "")
 
   (bind* #<<ENDC
 #ifndef CHICKEN
@@ -323,8 +416,6 @@ ENDC
 (define swap-sbe32 swapSBE32)
 (define swap-ube32 swapUBE32)
 (define get-mount-point getMountPoint)
-(define make-version make-Version)
-(define make-archive-info make-ArchiveInfo)
 (define linked-version linkedVersion)
 (define get-last-error getLastError)
 (define supported-archive-types supportedArchiveTypes)
@@ -355,6 +446,23 @@ ENDC
 (define utf8-from-ucs2 utf8FromUcs2)
 (define utf8-to-ucs2 utf8ToUcs2)
 (define utf8-from-latin1 utf8FromLatin1)
+(define archive-info? ArchiveInfo?)
+(define make-archive-info make-ArchiveInfo)
+(define archive-info-author ArchiveInfo-author)
+(define archive-info-author-set! ArchiveInfo-author-set!)
+(define archive-info-description ArchiveInfo-description)
+(define archive-info-description-set! ArchiveInfo-description-set!)
+(define archive-info-extension ArchiveInfo-extension)
+(define archive-info-extension-set! ArchiveInfo-extension-set!)
+(define archive-info-url ArchiveInfo-url)
+(define archive-info-url-set! ArchiveInfo-url-set!)
+(define version? Version?)
+(define make-version make-Version)
+(define version-major Version-major)
+(define version-minor Version-minor)
+(define version-patch Version-patch)
+(define make-file make-File)
+(define file-opaque File-opaque)
 
 (define (read-from-file file-name)
   (if (not (string? file-name))
@@ -366,7 +474,7 @@ ENDC
        (size (file-length phys-file))
        (data (make-blob size))
        (bytes-read (read phys-file data 1 size)))
-    (if (>= 0 bytes-read)
+    (if (>= bytes-read 0)
         (begin
           (close phys-file)
           (list bytes-read data))
