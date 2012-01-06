@@ -114,7 +114,6 @@ ENDC
                                 C_return(version.patch);")))
     (make-Version (major) (minor) (patch))))
 
-
 (define getLastError (foreign-lambda nonnull-c-string "getLastError"))
 
 (define supportedArchiveTypes
@@ -201,6 +200,8 @@ ENDC
                                            else
                                              C_return(C_SCHEME_FALSE);"))
 
+
+
 (define readSLE64 (foreign-lambda* integer64 (((c-pointer File) file))
                                           "PHYSFS_sint64 val = 0;
                                            if (0 != PHYSFS_readSLE64(file, &val))
@@ -286,4 +287,106 @@ ENDC
                                                "char *dst = (char *)C_alloc(sizeof(char) * len);
                                               PHYSFS_utf8FromLatin1((char *)src, dst, len);;
                                               C_return(dst);"))
+
+;;; Scheme style renames for library functions. Here goes!
+(define permit-symbolic-links permitSymbolicLinks)
+(define set-write-dir setWriteDir)
+(define remove-from-search-path removeFromSearchPath)
+(define directory? isDirectory)
+(define symbolic-link? isSymbolicLink)
+(define set-sane-config setSaneConfig)
+(define add-to-search-path addToSearchPath)
+(define write-sle16 writeSLE16)
+(define write-ule16 writeULE16)
+(define write-sbe16 writeSBE16)
+(define write-ube16 writeUBE16)
+(define write-sle32 writeSLE32)
+(define write-ule32 writeULE32)
+(define write-sbe32 writeSBE32)
+(define write-ube32 writeUBE32)
+(define init? isInit)
+(define symbolic-links-permitted symbolicLinksPermitted)
+(define get-dir-separator getDirSeparator)
+(define get-base-dir getBaseDir)
+(define get-user-dir getUserDir)
+(define get-write-dir getWriteDir)
+(define get-real-dir getRealDir)
+(define open-write openWrite)
+(define open-append openAppend)
+(define open-read openRead)
+(define swap-sle16 swapSLE16)
+(define swap-ule16 swapULE16)
+(define swap-sbe16 swapSBE16)
+(define swap-ube16 swapUBE16)
+(define swap-sle32 swapSLE32)
+(define swap-ule32 swapULE32)
+(define swap-sbe32 swapSBE32)
+(define swap-ube32 swapUBE32)
+(define get-mount-point getMountPoint)
+(define make-version make-Version)
+(define make-archive-info make-ArchiveInfo)
+(define linked-version linkedVersion)
+(define get-last-error getLastError)
+(define supported-archive-types supportedArchiveTypes)
+(define get-cdrom-dirs getCdRomDirs)
+(define get-search-path getSearchPath)
+(define enumerate-files enumerateFiles)
+(define read-sle16 readSLE16)
+(define read-sbe16 readSBE16)
+(define read-ule16 readULE16)
+(define read-ube16 readUBE16)
+(define read-sle32 readSLE32)
+(define read-sbe32 readSBE32)
+(define read-ule32 readULE32)
+(define read-ube32 readUBE32)
+(define write-sle64 writeSLE64)
+(define write-ule64 writeULE64)
+(define write-sbe64 writeSBE64)
+(define write-ube64 writeUBE64)
+(define get-last-mod-time getLastModTime)
+(define file-length fileLength)
+(define set-buffer setBuffer)
+(define swap-sle64 swapSLE64)
+(define swap-ule64 swapULE64)
+(define swap-sbe64 swapSBE64)
+(define swap-ube64 swapUBE64)
+(define utf8-from-ucs4 utf8FromUcs4)
+(define utf8-to-ucs4 utf8ToUcs4)
+(define utf8-from-ucs2 utf8FromUcs2)
+(define utf8-to-ucs2 utf8ToUcs2)
+(define utf8-from-latin1 utf8FromLatin1)
+
+(define (read-from-file file-name)
+  (if (not (string? file-name))
+      (error "file-name must be a string"))
+  (if (not (exists file-name))
+      (error "File does not exist in mount point"))
+  (let*
+      ((phys-file (open-read file-name))
+       (size (file-length phys-file))
+       (data (make-blob size))
+       (bytes-read (read phys-file data 1 size)))
+    (if (>= 0 bytes-read)
+        (begin
+          (close phys-file)
+          (list bytes-read data))
+        (begin
+          (close phys-file)
+          #f))))
+
+(define (write-to-file file-name data)
+  (if (not (string? file-name))
+      (error "file-name must be a string"))
+  (if (not (blob? data))
+      (error "data must be a blob"))
+  (let*
+      ((phys-file (open-write file-name))
+       (bytes-written (write phys-file data 1 (blob-size data))))
+    (if (= bytes-written (blob-size data))
+        (begin
+          (close phys-file)
+          bytes-written)
+        (begin
+          (close phys-file)
+          #f))))
 )
