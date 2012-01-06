@@ -477,7 +477,7 @@ ENDC
     (if (>= bytes-read 0)
         (begin
           (close phys-file)
-          (list bytes-read data))
+          data)
         (begin
           (close phys-file)
           #f))))
