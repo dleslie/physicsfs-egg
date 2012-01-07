@@ -84,7 +84,9 @@ Many game-specific archivers are seriously unprepared for Unicode (the Descent H
 
 === Types
 
-==== <type>file</type>
+==== Files
+
+<type>file</type>
 
 A PhysicsFS file handle.
 
@@ -92,38 +94,62 @@ You get a pointer to one of these when you open a file for reading, writing, or 
 
 As you can see from the lack of meaningful fields, you should treat this as opaque data. Don't try to manipulate the file handle, just pass the pointer you got, unmolested, to various PhysicsFS APIs.
 
-* <procedure>(file-opaque file)</procedure>
+<procedure>(file-opaque file)</procedure>
 
 Fetches the opaque pointer contained within the file struct.
 
-==== <type>archive-info</type>
+==== Archives
+
+<type>archive-info</type>
 
 Information on various PhysicsFS-supported archives.
 
 This structure gives you details on what sort of archives are supported by this implementation of PhysicsFS. Archives tend to be things like ZIP files and such.
 
-* <procedure>(make-archive-info)</procedure> : Constructs an archive-info record, not that you should ever need to.
-* <procedure>(archive-info? archive-info)</procedure> : Tests if an object is an archive-info.
-* <procedure>(archive-info-extension archive-info)</procedure> : Archive file extension: "ZIP", for example.
-* <procedure>(archive-info-description archive-info)</procedure> : Human-readable archive description.
-* <procedure>(archive-info-author archive-info)</procedure> : Person who did support for this archive.
-* <procedure>(archive-info-url archive-info)</procedure> : URL related to this archive
+<procedure>(make-archive-info)</procedure>
+Constructs an archive-info record, not that you should ever need to.
 
-==== <type>version</type>
+<procedure>(archive-info? archive-info)</procedure>
+Tests if an object is an archive-info.
+
+<procedure>(archive-info-extension archive-info)</procedure>
+Archive file extension: "ZIP", for example.
+
+<procedure>(archive-info-description archive-info)</procedure>
+Human-readable archive description.
+
+<procedure>(archive-info-author archive-info)</procedure>
+Person who did support for this archive.
+
+<procedure>(archive-info-url archive-info)</procedure>
+URL related to this archive
+
+==== Versioning
+
+<type>version</type>
 
 Information the version of PhysicsFS in use.
 
 Represents the library's version as three levels: major revision (increments with massive changes, additions, and enhancements), minor revision (increments with backwards-compatible changes to the major revision), and patchlevel (increments with fixes to the minor revision).
 
-* <procedure>(make-version)</procedure> : Constructs a version record, not that you should ever need to.
-* <procedure>(version? version)</procedure> : Tests if an object is a version.
-* <procedure>(version-major version)</procedure> : major revision
-* <procedure>(version-minor version)</procedure> : minor revision
-* <procedure>(version-patch version)</procedure> : patch level
+<procedure>(make-version)</procedure>
+Constructs a version record, not that you should ever need to.
+
+<procedure>(version? version)</procedure>
+Tests if an object is a version.
+
+<procedure>(version-major version)</procedure>
+Fetches major revision.
+
+<procedure>(version-minor version)</procedure>
+Fetches minor revision.
+
+<procedure>(version-patch version)</procedure>
+Fetches patch level.
 
 === PhysicsFS state
 
-==== <procedure>(get-linked-version)</procedure>
+<procedure>(get-linked-version)</procedure>
 
 Get the version of PhysicsFS that is linked against your program.
 
@@ -131,7 +157,7 @@ If you are using a shared library (DLL) version of PhysFS, then it is possible t
 
 This function may be called safely at any time, even before PHYSFS_init().
 
-==== <procedure>(init)</procedure>
+<procedure>(init)</procedure>
 
  Initialize the PhysicsFS library.
 
@@ -141,7 +167,7 @@ This should be called prior to any attempts to change your process's current wor
 
 Returns nonzero on success, zero on error. Specifics of the error can be gleaned from (getLastError).
 
-==== <procedure>(deinit)</procedure>
+<procedure>(deinit)</procedure>
 
 Deinitialize the PhysicsFS library.
 
@@ -153,7 +179,7 @@ Once successfully deinitialized, (init) can be called again to restart the subsy
 
 Returns nonzero on success, zero on error. Specifics of the error can be gleaned from (getLastError). If failure, state of PhysFS is undefined, and probably badly screwed up.
 
-==== <procedure>(supported-archive-types)</procedure>
+<procedure>(supported-archive-types)</procedure>
 
 Get a list of supported archive types.
 
@@ -161,7 +187,7 @@ Get a list of archive types supported by this implementation of PhysicFS. These 
 
 The returned value is a list of ArchiveInfo records.
 
-==== <procedure>(get-last-error)</procedure>
+<procedure>(get-last-error)</procedure>
 
 Get human-readable error information.
 
@@ -169,13 +195,13 @@ Get the last PhysicsFS error message as a human-readable string. This will be em
 
 It is not wise to expect a specific string of characters here, since the error message may be localized into an unfamiliar language. These strings are meant to be passed on directly to the user.
 
-==== <procedure>(get-dir-separator)</procedure>
+<procedure>(get-dir-separator)</procedure>
 
 Get platform-dependent dir separator string.
 
 This returns "\\" on win32, "/" on Unix, and ":" on MacOS. It may be more than one character, depending on the platform, and your code should take that into account. Note that this is only useful for setting up the search/write paths, since access into those dirs always use '/' (platform-independent notation) to separate directories. This is also handy for getting platform-independent access when using stdio calls.
 
-==== <procedure>(permit-symbolic-links bool)</procedure>
+<procedure>(permit-symbolic-links bool)</procedure>
 
 Enable or disable following of symbolic links.
 
@@ -189,7 +215,7 @@ Symlinks are only explicitly checked when dealing with filenames in platform-ind
 
 Symbolic link permission can be enabled or disabled at any time after you've called (init), and is disabled by default.
 
-==== <procedure>(get-cdrom-dirs)</procedure>
+<procedure>(get-cdrom-dirs)</procedure>
 
 Get an array of paths to available CD-ROM drives.
 
@@ -199,7 +225,7 @@ This function refers to "CD-ROM" media, but it really means "inserted disc media
 
 This call may block while drives spin up. Be forewarned.
 
-==== <procedure>(get-base-dir)</procedure>
+<procedure>(get-base-dir)</procedure>
 
 Get the path where the application resides.
 
@@ -209,7 +235,7 @@ Get the "base dir". This is the directory where the application was run from, wh
 
 You should probably use the base dir in your search path.
 
-==== <procedure>(get-user-dir)</procedure>
+<procedure>(get-user-dir)</procedure>
 
 Get the path where user's home directory resides.
 
@@ -219,13 +245,13 @@ Get the "user dir". This is meant to be a suggestion of where a specific user of
 
 You should probably use the user dir as the basis for your write dir, and also put it near the beginning of your search path.
 
-==== <procedure>(get-write-dir)</procedure>
+<procedure>(get-write-dir)</procedure>
 
 Get path where PhysicsFS will allow file writing.
 
 Get the current write dir. The default write dir is NULL.
 
-==== <procedure>(set-write-dir dir)</procedure>
+<procedure>(set-write-dir dir)</procedure>
 
 Tell PhysicsFS where it may write files.
 
@@ -233,7 +259,7 @@ Set a new write dir. This will override the previous setting.
 
 This call will fail (and fail to change the write dir) if the current write dir still has files open in it.
 
-==== <procedure>(add-to-search-path newDir appendToPath)</procedure>
+<procedure>(add-to-search-path newDir appendToPath)</procedure>
 
 Add an archive or directory to the search path.
 
@@ -241,7 +267,7 @@ This is a legacy call in PhysicsFS 2.0, equivalent to: (mount newDir "" appendTo
 
 You must use this and not (mount) if binary compatibility with PhysicsFS 1.0 is important (which it may not be for many people).
 
-==== <procedure>(remove-from-search-path oldDir)</procedure>
+<procedure>(remove-from-search-path oldDir)</procedure>
 
 Remove a directory or archive from the search path.
 
@@ -249,13 +275,13 @@ This must be a (case-sensitive) match to a dir or archive already in the search 
 
 This call will fail (and fail to remove from the path) if the element still has files open in it.
 
-==== <procedure>(get-search-path)</procedure>
+<procedure>(get-search-path)</procedure>
 
 Get the current search path.
 
 The default search path is an empty list.
 
-==== <procedure>(set-sane-config organization appName archiveExt includeCdRoms archivesFirst)</procedure>
+<procedure>(set-sane-config organization appName archiveExt includeCdRoms archivesFirst)</procedure>
 
 Set up sane, default paths.
 
@@ -276,7 +302,7 @@ These directories are then searched for files ending with the extension (archive
 All of this can be accomplished from the application, but this just does it all for you. Feel free to add more to the search path manually, too.
 === Directory Management
 
-==== <procedure>(mkdir dirName)</procedure>
+<procedure>(mkdir dirName)</procedure>
 
 Create a directory.
 
@@ -284,7 +310,7 @@ This is specified in platform-independent notation in relation to the write dir.
 
 So if you've got the write dir set to "C:\mygame\writedir" and call (mkdir "downloads/maps") then the directories "C:\mygame\writedir\downloads" and "C:\mygame\writedir\downloads\maps" will be created if possible. If the creation of "maps" fails after we have successfully created "downloads", then the function leaves the created directory behind and reports failure.
 
-==== <procedure>(delete filename)</procedure>
+<procedure>(delete filename)</procedure>
 
 Delete a file or directory.
 
@@ -300,7 +326,7 @@ Note that on Unix systems, deleting a file may be successful, but the actual fil
 
 Chances are, the bits that make up the file still exist, they are just made available to be written over at a later point. Don't consider this a security method or anything.  :)
 
-==== <procedure>(get-real-dir filename)</procedure>
+<procedure>(get-real-dir filename)</procedure>
 
 Figure out where in the search path a file resides.
 
@@ -312,7 +338,7 @@ If a any part of a match is a symbolic link, and you've not explicitly permitted
 
 If you specify a fake directory that only exists as a mount point, it'll be associated with the first archive mounted there, even though that directory isn't necessarily contained in a real archive.
 
-==== <procedure>(enumerate-files dir)</procedure>
+<procedure>(enumerate-files dir)</procedure>
 
 Get a file listing of a search path's directory.
 
@@ -320,7 +346,7 @@ Matching directories are interpolated.
 
 Feel free to sort the list however you like. We only promise there will be no duplicates, but not what order the final list will come back in.
 
-==== <procedure>(exists filename)</procedure>
+<procedure>(exists filename)</procedure>
 
 Determine if a file exists in the search path.
 
@@ -328,7 +354,7 @@ Reports true if there is an entry anywhere in the search path by the name of (fi
 
 Note that entries that are symlinks are ignored if (permitSymbolicLinks #t) hasn't been called, so you might end up further down in the search path than expected.
 
-==== <procedure>(directory? filename)</procedure>
+<procedure>(directory? filename)</procedure>
 
 Determine if a file in the search path is really a directory.
 
@@ -336,7 +362,7 @@ Determine if the first occurence of (fname) in the search path is really a direc
 
 Note that entries that are symlinks are ignored if (permitSymbolicLinks #t) hasn't been called, so you might end up further down in the search path than expected.
 
-==== <procedure>(symbolic-link? filename)</procedure>
+<procedure>(symbolic-link? filename)</procedure>
 
 Determine if a file in the search path is really a symbolic link.
 
@@ -344,7 +370,7 @@ Determine if the first occurence of (filename) in the search path is really a sy
 
 Note that entries that are symlinks are ignored if (permitSymbolicLinks #t) hasn't been called, and as such, this function will always return 0 in that case.
 
-==== <procedure>(get-last-mod-time filename)</procedure>
+<procedure>(get-last-mod-time filename)</procedure>
 
 Get the last modification time of a file.
 
@@ -352,7 +378,7 @@ The modtime is returned as a number of seconds since the epoch (Jan 1, 1970). Th
 
 === Input/Output
 
-==== <procedure>(open-write filename)</procedure>
+<procedure>(open-write filename)</procedure>
 
 Open a file for writing.
 
@@ -360,7 +386,7 @@ Open a file for writing, in platform-independent notation and in relation to the
 
 Note that entries that are symlinks are ignored if (permitSymbolicLinks #t) hasn't been called, and opening a symlink with this function will fail in such a case.
 
-==== <procedure>(open-append filename)</procedure>
+<procedure>(open-append filename)</procedure>
 
 Open a file for appending.
 
@@ -368,7 +394,7 @@ Open a file for writing, in platform-independent notation and in relation to the
 
 Note that entries that are symlinks are ignored if (permitSymbolicLinks #t) hasn't been called, and opening a symlink with this function will fail in such a case.
 
-==== <procedure>(open-read filename)</procedure>
+<procedure>(open-read filename)</procedure>
 
 Open a file for reading.
 
@@ -376,19 +402,19 @@ Open a file for reading, in platform-independent notation. The search path is ch
 
 Note that entries that are symlinks are ignored if (permitSymbolicLinks #t) hasn't been called, and opening a symlink with this function will fail in such a case.
 
-==== <procedure>(close handle)</procedure>
+<procedure>(close handle)</procedure>
 
 Close a PhysicsFS filehandle.
 
 This call is capable of failing if the operating system was buffering writes to the physical media, and, now forced to write those changes to physical media, can not store the data for some reason. In such a case, the filehandle stays open. A well-written program should ALWAYS check the return value from the close call in addition to every writing call!
 
-==== <procedure>(read handle buffer objSize objCount)</procedure>
+<procedure>(read handle buffer objSize objCount)</procedure>
 
 Read data from a PhysicsFS filehandle
 
 The file must be opened for reading.
 
-==== <procedure>(write handle buffer objSize objCount)</procedure>
+<procedure>(write handle buffer objSize objCount)</procedure>
 
 Write data to a PhysicsFS filehandle
 
@@ -396,23 +422,23 @@ The file must be opened for writing.
 
 === File Positioning
 
-==== <procedure>(eof handle)</procedure>
+<procedure>(eof handle)</procedure>
 
 Check for end-of-file state on a PhysicsFS filehandle.
 
 Determine if the end of file has been reached in a PhysicsFS filehandle.
 
-==== <procedure>(tell handle)</procedure>
+<procedure>(tell handle)</procedure>
 
 Determine current position within a PhysicsFS filehandle.
 
-==== <procedure>(seek handle pos)</procedure>
+<procedure>(seek handle pos)</procedure>
 
 Seek to a new position within a PhysicsFS filehandle.
 
 The next read or write will occur at that place. Seeking past the beginning or end of the file is not allowed, and causes an error.
 
-==== <procedure>(file-length handle)</procedure>
+<procedure>(file-length handle)</procedure>
 
 Get total length of a file in bytes.
 
@@ -420,7 +446,7 @@ Note that if the file size can't be determined (since the archive is "streamed" 
 
 === Buffering
 
-==== <procedure>(set-buffer handle bufsize)</procedure>
+<procedure>(set-buffer handle bufsize)</procedure>
 
 Set up buffering for a PhysicsFS file handle.
 
@@ -438,7 +464,7 @@ PhysicsFS file handles are unbuffered by default.
 
 Please check the return value of this function! Failures can include not being able to seek backwards in a read-only file when removing the buffer, not being able to allocate the buffer, and not being able to flush the buffer to disk, among other unexpected problems.
 
-==== <procedure>(flush handle)</procedure>
+<procedure>(flush handle)</procedure>
 
 Flush a buffered PhysicsFS file handle.
 
@@ -448,217 +474,217 @@ For buffered files opened for reading or unbuffered files, this is a safe no-op,
 
 === Byte Ordering
 
-==== <procedure>(swap-sle16 val)</procedure>
+<procedure>(swap-sle16 val)</procedure>
 
 Swap littleendian signed 16 to platform's native byte order.
 
 Take a 16-bit signed value in littleendian format and convert it to the platform's native byte order.
 
-==== <procedure>(swap-ule16 val)</procedure>
+<procedure>(swap-ule16 val)</procedure>
 
 Swap littleendian unsigned 16 to platform's native byte order.
 
 Take a 16-bit unsigned value in littleendian format and convert it to the platform's native byte order.
 
-==== <procedure>(swap-sle32 val)</procedure>
+<procedure>(swap-sle32 val)</procedure>
 
 Swap littleendian signed 32 to platform's native byte order.
 
 Take a 32-bit signed value in littleendian format and convert it to the platform's native byte order.
 
-==== <procedure>(swap-ule32 val)</procedure>
+<procedure>(swap-ule32 val)</procedure>
 
 Swap littleendian unsigned 32 to platform's native byte order.
 
 Take a 32-bit unsigned value in littleendian format and convert it to the platform's native byte order.
 
-==== <procedure>(swap-sle64 val)</procedure>
+<procedure>(swap-sle64 val)</procedure>
 
 Swap littleendian signed 64 to platform's native byte order.
 
 Take a 64-bit signed value in littleendian format and convert it to the platform's native byte order.
 
-==== <procedure>(swap-ule64 val)</procedure>
+<procedure>(swap-ule64 val)</procedure>
 
 Swap littleendian unsigned 64 to platform's native byte order.
 
 Take a 64-bit unsigned value in littleendian format and convert it to the platform's native byte order.
 
-==== <procedure>(swap-sbe16 val)</procedure>
+<procedure>(swap-sbe16 val)</procedure>
 
 Swap bigendian signed 16 to platform's native byte order.
 
 Take a 16-bit signed value in bigendian format and convert it to the platform's native byte order.
 
-==== <procedure>(swap-ube16 val)</procedure>
+<procedure>(swap-ube16 val)</procedure>
 
 Swap bigendian unsigned 16 to platform's native byte order.
 
 Take a 16-bit unsigned value in bigendian format and convert it to the platform's native byte order.
 
-==== <procedure>(swap-sbe32 val)</procedure>
+<procedure>(swap-sbe32 val)</procedure>
 
 Swap bigendian signed 32 to platform's native byte order.
 
 Take a 32-bit signed value in bigendian format and convert it to the platform's native byte order.
 
-==== <procedure>(swap-ube32 val)</procedure>
+<procedure>(swap-ube32 val)</procedure>
 
 Swap bigendian unsigned 32 to platform's native byte order.
 
 Take a 32-bit unsigned value in bigendian format and convert it to the platform's native byte order.
 
-==== <procedure>(swap-sbe64 val)</procedure>
+<procedure>(swap-sbe64 val)</procedure>
 
 Swap bigendian signed 64 to platform's native byte order.
 
 Take a 64-bit signed value in bigendian format and convert it to the platform's native byte order.
 
-==== <procedure>(swap-ube64 val)</procedure>
+<procedure>(swap-ube64 val)</procedure>
 
 Swap bigendian unsigned 64 to platform's native byte order.
 
 Take a 64-bit unsigned value in bigendian format and convert it to the platform's native byte order.
 
-==== <procedure>(read-sle16 file)</procedure>
+<procedure>(read-sle16 file)</procedure>
 
 Read and convert a signed 16-bit littleendian value.
 
 Convenience function. Read a signed 16-bit littleendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(read-ule16 file)</procedure>
+<procedure>(read-ule16 file)</procedure>
 
 Read and convert an unsigned 16-bit littleendian value.
 
 Convenience function. Read an unsigned 16-bit littleendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(read-sbe16 file)</procedure>
+<procedure>(read-sbe16 file)</procedure>
 
 Read and convert a signed 16-bit bigendian value.
 
 Convenience function. Read a signed 16-bit bigendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(read-ube16 file)</procedure>
+<procedure>(read-ube16 file)</procedure>
 
 Read and convert an unsigned 16-bit bigendian value.
 
 Convenience function. Read an unsigned 16-bit bigendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(read-sle32 file)</procedure>
+<procedure>(read-sle32 file)</procedure>
 
 Read and convert a signed 32-bit littleendian value.
 
 Convenience function. Read a signed 32-bit littleendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(read-ule32 file)</procedure>
+<procedure>(read-ule32 file)</procedure>
 
 Read and convert an unsigned 32-bit littleendian value.
 
 Convenience function. Read an unsigned 32-bit littleendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(read-sbe32 file)</procedure>
+<procedure>(read-sbe32 file)</procedure>
 
 Read and convert a signed 32-bit bigendian value.
 
 Convenience function. Read a signed 32-bit bigendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(read-ube32 file)</procedure>
+<procedure>(read-ube32 file)</procedure>
 
 Read and convert an unsigned 32-bit bigendian value.
 
 Convenience function. Read an unsigned 32-bit bigendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(read-sle64 file)</procedure>
+<procedure>(read-sle64 file)</procedure>
 
 Read and convert a signed 64-bit littleendian value.
 
 Convenience function. Read a signed 64-bit littleendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(read-ule64 file)</procedure>
+<procedure>(read-ule64 file)</procedure>
 
 Read and convert an unsigned 64-bit littleendian value.
 
 Convenience function. Read an unsigned 64-bit littleendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(read-sbe64 file)</procedure>
+<procedure>(read-sbe64 file)</procedure>
 
 Read and convert a signed 64-bit bigendian value.
 
 Convenience function. Read a signed 64-bit bigendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(read-ube64 file)</procedure>
+<procedure>(read-ube64 file)</procedure>
 
 Read and convert an unsigned 64-bit bigendian value.
 
 Convenience function. Read an unsigned 64-bit bigendian value from a file and convert it to the platform's native byte order.
 
-==== <procedure>(write-sle16 file val)</procedure>
+<procedure>(write-sle16 file val)</procedure>
 
 Convert and write a signed 16-bit littleendian value.
 
 Convenience function. Convert a signed 16-bit value from the platform's native byte order to littleendian and write it to a file.
 
-==== <procedure>(write-ule16 file val)</procedure>
+<procedure>(write-ule16 file val)</procedure>
 
 Convert and write an unsigned 16-bit littleendian value.
 
 Convenience function. Convert an unsigned 16-bit value from the platform's native byte order to littleendian and write it to a file.
 
-==== <procedure>(write-sbe16 file val)</procedure>
+<procedure>(write-sbe16 file val)</procedure>
 
 Convert and write a signed 16-bit bigendian value.
 
 Convenience function. Convert a signed 16-bit value from the platform's native byte order to bigendian and write it to a file.
 
-==== <procedure>(write-ube16 file val)</procedure>
+<procedure>(write-ube16 file val)</procedure>
 
 Convert and write an unsigned 16-bit bigendian value.
 
 Convenience function. Convert an unsigned 16-bit value from the platform's native byte order to bigendian and write it to a file.
 
-==== <procedure>(write-sle32 file val)</procedure>
+<procedure>(write-sle32 file val)</procedure>
 
 Convert and write a signed 32-bit littleendian value.
 
 Convenience function. Convert a signed 32-bit value from the platform's native byte order to littleendian and write it to a file.
 
-==== <procedure>(write-ule32 file val)</procedure>
+<procedure>(write-ule32 file val)</procedure>
 
 Convert and write an unsigned 32-bit littleendian value.
 
 Convenience function. Convert an unsigned 32-bit value from the platform's native byte order to littleendian and write it to a file.
 
-==== <procedure>(write-sbe32 file val)</procedure>
+<procedure>(write-sbe32 file val)</procedure>
 
 Convert and write a signed 32-bit bigendian value.
 
 Convenience function. Convert a signed 32-bit value from the platform's native byte order to bigendian and write it to a file.
 
-==== <procedure>(write-ube32 file val)</procedure>
+<procedure>(write-ube32 file val)</procedure>
 
 Convert and write an unsigned 32-bit bigendian value.
 
 Convenience function. Convert an unsigned 32-bit value from the platform's native byte order to bigendian and write it to a file.
 
-==== <procedure>(write-sle64 file val)</procedure>
+<procedure>(write-sle64 file val)</procedure>
 
 Convert and write a signed 64-bit littleendian value.
 
 Convenience function. Convert a signed 64-bit value from the platform's native byte order to littleendian and write it to a file.
 
-==== <procedure>(write-ule64 file val)</procedure>
+<procedure>(write-ule64 file val)</procedure>
 
 Convert and write an unsigned 64-bit littleendian value.
 
 Convenience function. Convert an unsigned 64-bit value from the platform's native byte order to littleendian and write it to a file.
 
-==== <procedure>(write-sbe64 file val)</procedure>
+<procedure>(write-sbe64 file val)</procedure>
 
 Convert and write a signed 64-bit bigending value.
 
 Convenience function. Convert a signed 64-bit value from the platform's native byte order to bigendian and write it to a file.
 
-==== <procedure>(write-ube64 file val)</procedure>
+<procedure>(write-ube64 file val)</procedure>
 
 Convert and write an unsigned 64-bit bigendian value.
 
@@ -666,19 +692,19 @@ Convenience function. Convert an unsigned 64-bit value from the platform's nativ
 
 == PhysicsFS 2.0 Functionality
 
-==== <procedure>(init?)</procedure>
+<procedure>(init?)</procedure>
 
 Determine if the PhysicsFS library is initialized.
 
 Once (init) returns successfully, this will return non-zero. Before a successful (init) and after (deinit) returns successfully, this will return zero. This function is safe to call at any time.
 
-==== <procedure>(symbolic-links-permitted)</procedure>
+<procedure>(symbolic-links-permitted)</procedure>
 
 Determine if the symbolic links are permitted.
 
 This reports the setting from the last call to (permit-symbolic-links). If (permitSymbolicLinks) hasn't been called since the library was last initialized, symbolic links are implicitly disabled.
 
-==== <procedure>(mount newDir mountPoint appendToPath)</procedure>
+<procedure>(mount newDir mountPoint appendToPath)</procedure>
 
 Add an archive or directory to the search path.
 
@@ -688,7 +714,7 @@ When you mount an archive, it is added to a virtual file system...all files in a
 
 The mountpoint does not need to exist prior to mounting, which is different than those familiar with the Unix concept of "mounting" may not expect. As well, more than one archive can be mounted to the same mountpoint, or mountpoints and archive contents can overlap...the interpolation mechanism still functions as usual.
 
-==== <procedure>(getMountPoint dir)</procedure>
+<procedure>(getMountPoint dir)</procedure>
 
 Determine a mounted archive's mountpoint.
 
@@ -696,19 +722,19 @@ You give this function the name of an archive or dir you successfully added to t
 
 === UTF8 Functions
 
-==== <procedure>(utf8-from-ucs4 src len)</procedure>
+<procedure>(utf8-from-ucs4 src len)</procedure>
 
 Convert a UCS-4 string to a UTF-8 string.
 
 UCS-4 strings are 32-bits per character: \c wchar_t on Unix.
 
-==== <procedure>(utf8-to-ucs4 src len)</procedure>
+<procedure>(utf8-to-ucs4 src len)</procedure>
 
 Convert a UTF-8 string to a UCS-4 string.
 
 UCS-4 strings are 32-bits per character: \c wchar_t on Unix.
 
-==== <procedure>(utf8-from-ucs2 src len)</procedure>
+<procedure>(utf8-from-ucs2 src len)</procedure>
 
 Convert a UCS-2 string to a UTF-8 string.
 
@@ -716,7 +742,7 @@ UCS-2 strings are 16-bits per character: \c TCHAR on Windows, when building with
 
 Please note that UCS-2 is not UTF-16; we do not support the "surrogate" values at this time.
 
-==== <procedure>(utf8-to-ucs2 src len)</procedure>
+<procedure>(utf8-to-ucs2 src len)</procedure>
 
 Convert a UTF-8 string to a UCS-2 string.
 
@@ -724,7 +750,7 @@ UCS-2 strings are 16-bits per character: \c TCHAR on Windows, when building with
 
 Please note that UCS-2 is not UTF-16; we do not support the "surrogate" values at this time.
 
-==== <procedure>(utf8-from-latin1 src len)</procedure>
+<procedure>(utf8-from-latin1 src len)</procedure>
 
 Convert a UTF-8 string to a Latin1 string.
 
@@ -734,13 +760,13 @@ Please note that we do not supply a UTF-8 to Latin1 converter, since Latin1 can'
 
 === Convenience Functions
 
-==== <procedure>(read-from-file file-name)</procedure>
+<procedure>(read-from-file file-name)</procedure>
 
 Assuming that PhysicsFS has been initialized and that a location has been mounted, this function will read an entire file into a <type>blob</type>.
 
 Throws errors if the parameter is not a string, or if the declared file name cannot be found, or if PhysicsFS is not initialized.
 
-==== <procedure>(write-to-file file-name data)</procedure>
+<procedure>(write-to-file file-name data)</procedure>
 
 Assuming that PhysicsFS has been initialized and that a mount point is available; given a file name and a <type>blob</type> this function will write the entire contents of the blob to the file.
 
