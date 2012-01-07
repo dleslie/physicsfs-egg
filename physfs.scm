@@ -207,7 +207,7 @@ ENDC
                                 C_return(version.patch);")))
     (make-Version (major) (minor) (patch))))
 
-(define getLastError (foreign-lambda nonnull-c-string "getLastError"))
+(define getLastError (foreign-lambda nonnull-c-string "PHYSFS_getLastError"))
 
 (define supportedArchiveTypes
   (letrec ((data-ptr (foreign-value "PHYSFS_supportedArchiveTypes()" (c-pointer c-pointer)))
