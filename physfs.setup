@@ -1,6 +1,6 @@
-(compile -s -O2 -d1 physfs.scm -j physfs -lphysfs)
-(compile -s physfs.import.scm -O2 -d0 -lphysfs)
-(compile -c -O2 -d1 physfs.scm -unit physfs -j physfs -lphysfs)
+(compile -s -O2 -d1 physfs.scm -j physfs -lphysfs ,@(if (version>=? (chicken-version) "4.7.0") '(-D improved-64-bit-support) '()))
+(compile -s physfs.import.scm -O2 -d0 -lphysfs ,@(if (version>=? (chicken-version) "4.7.0") '(-D improved-64-bit-support) '()))
+(compile -c -O2 -d1 physfs.scm -unit physfs -j physfs -lphysfs ,@(if (version>=? (chicken-version) "4.7.0") '(-D improved-64-bit-support) '()))
 
 (install-extension
  'physfs

@@ -1,97 +1,8 @@
-(module physfs 
-        (archive-info?
-         archive-info-author
-         archive-info-author-set!
-         archive-info-description
-         archive-info-description-set!
-         archive-info-extension
-         archive-info-extension-set!
-         archive-info-url
-         archive-info-url-set!
-         add-to-search-path
-         close
-         deinit
-         delete
-         directory?
-         enumerate-files
-         eof
-         exists
-         file-length
-         file-opaque
-         flush
-         get-base-dir
-         get-cdrom-dirs
-         get-dir-separator
-         get-last-error
-         get-last-mod-time
-         get-mount-point
-         get-real-dir
-         get-search-path
-         get-user-dir
-         get-write-dir
-         init
-         init?
-         linked-version
-         make-archive-info
-         make-version
-         mkdir
-         mount
-         open-append
-         open-read
-         open-write
-         permit-symbolic-links
-         read-from-file
-         read-sbe16
-         read-sbe32
-         read-sle16
-         read-sle32
-         read-ube16
-         read-ube32
-         read-ule16
-         read-ule32
-         remove-from-search-path
-         seek
-         set-buffer
-         set-sane-config
-         set-write-dir
-         supported-archive-types
-         swap-sbe16
-         swap-sbe32
-         swap-sbe64
-         swap-sle16
-         swap-sle32
-         swap-sle64
-         swap-ube16
-         swap-ube32
-         swap-ube64
-         swap-ule16
-         swap-ule32
-         swap-ule64
-         symbolic-link?
-         symbolic-links-permitted
-         tell
-         utf8-from-latin1
-         utf8-from-ucs2
-         utf8-from-ucs4
-         utf8-to-ucs2
-         utf8-to-ucs4
-         version?
-         version-major
-         version-minor
-         version-patch
-         write-sbe16
-         write-sbe32
-         write-sbe64
-         write-sle16
-         write-sle32
-         write-sle64
-         write-to-file
-         write-ube16
-         write-ube32
-         write-ube64
-         write-ule16
-         write-ule32
-         write-ule64)
+#>
+#include <physfs.h>
+<#
+
+(module physfs *
 
         (import chicken scheme foreign bind miscmacros)
 
@@ -99,10 +10,6 @@
         (bind-rename/pattern "PHYSFS_" "")
 
   (bind* #<<ENDC
-#ifndef CHICKEN
-#include <physfs.h>
-#endif
-
 //////////////////////////////////////////////////////////////////////
 // Bind-consumable definitions
 //////////////////////////////////////////////////////////////////////
@@ -293,93 +200,120 @@ ENDC
                                            else
                                              C_return(C_SCHEME_FALSE);"))
 
+(define seek (foreign-lambda integer "PHYSFS_seek" (c-pointer File) unsigned-integer64))
 
+(define setBuffer (foreign-lambda integer "PHYSFS_setBuffer" (c-pointer File) unsigned-integer64))
 
-(define readSLE64 (foreign-lambda* integer64 (((c-pointer File) file))
-                                          "PHYSFS_sint64 val = 0;
+;; 64-bit stuff is not available in older Chickens
+(cond-expand (improved-64-bit-support
+              (define readSLE64 (foreign-lambda* integer64 (((c-pointer File) file))
+                                                 "PHYSFS_sint64 val = 0;
                                            if (0 != PHYSFS_readSLE64(file, &val))
                                              C_return(val);
                                            else
                                              C_return(C_SCHEME_FALSE);"))
 
-(define readULE64 (foreign-lambda* unsigned-integer64 (((c-pointer File) file))
-                                          "PHYSFS_uint64 val = 0;
+              (define readULE64 (foreign-lambda* unsigned-integer64 (((c-pointer File) file))
+                                                 "PHYSFS_uint64 val = 0;
                                            if (0 != PHYSFS_readULE64(file, &val))
                                              C_return(val);
                                            else
                                              C_return(C_SCHEME_FALSE);"))
 
-(define readSBE64 (foreign-lambda* integer64 (((c-pointer File) file))
-                                          "PHYSFS_sint64 val = 0;
+              (define readSBE64 (foreign-lambda* integer64 (((c-pointer File) file))
+                                                 "PHYSFS_sint64 val = 0;
                                            if (0 != PHYSFS_readSBE64(file, &val))
                                              C_return(val);
                                            else
                                              C_return(C_SCHEME_FALSE);"))
 
-(define readUBE64 (foreign-lambda* integer64 (((c-pointer File) file))
-                                          "PHYSFS_uint64 val = 0;
+              (define readUBE64 (foreign-lambda* integer64 (((c-pointer File) file))
+                                                 "PHYSFS_uint64 val = 0;
                                            if (0 != PHYSFS_readUBE64(file, &val))
                                              C_return(val);
                                            else
                                              C_return(C_SCHEME_FALSE);"))
 
-(define writeSLE64 (foreign-lambda integer "PHYSFS_writeSLE64" (c-pointer File) integer64))
+              (define writeSLE64 (foreign-lambda integer "PHYSFS_writeSLE64" (c-pointer File) integer64))
 
-(define writeULE64 (foreign-lambda integer "PHYSFS_writeULE64" (c-pointer File) integer64))
+              (define writeULE64 (foreign-lambda integer "PHYSFS_writeULE64" (c-pointer File) integer64))
 
-(define writeSBE64 (foreign-lambda integer "PHYSFS_writeSBE64" (c-pointer File) integer64))
+              (define writeSBE64 (foreign-lambda integer "PHYSFS_writeSBE64" (c-pointer File) integer64))
 
-(define writeUBE64 (foreign-lambda integer "PHYSFS_writeUBE64" (c-pointer File) integer64))
+              (define writeUBE64 (foreign-lambda integer "PHYSFS_writeUBE64" (c-pointer File) integer64))
 
-(define getLastModTime (foreign-lambda integer64 "PHYSFS_getLastModTime" nonnull-c-string))
+              (define swapSLE64 (foreign-lambda integer64 "PHYSFS_swapSLE64" integer64))
 
-(define tell (foreign-lambda integer64 "PHYSFS_tell" (c-pointer File)))
+              (define swapULE64 (foreign-lambda unsigned-integer64 "PHYSFS_swapULE64" unsigned-integer64))
 
-(define fileLength (foreign-lambda integer64 "PHYSFS_fileLength" (c-pointer File)))
+              (define swapSBE64 (foreign-lambda integer64 "PHYSFS_swapSBE64" integer64))
 
-(define read (foreign-lambda integer64 "PHYSFS_read" (c-pointer File) nonnull-scheme-pointer unsigned-integer32 unsigned-integer32))
+              (define swapUBE64 (foreign-lambda unsigned-integer64 "PHYSFS_swapUBE64" unsigned-integer64))
 
-(define write (foreign-lambda integer64 "PHYSFS_write" (c-pointer File) nonnull-scheme-pointer unsigned-integer32 unsigned-integer32))
-
-(define seek (foreign-lambda integer "PHYSFS_seek" (c-pointer File) unsigned-integer64))
-
-(define setBuffer (foreign-lambda integer "PHYSFS_setBuffer" (c-pointer File) unsigned-integer64))
-
-(define swapSLE64 (foreign-lambda integer64 "PHYSFS_swapSLE64" integer64))
-
-(define swapULE64 (foreign-lambda unsigned-integer64 "PHYSFS_swapULE64" unsigned-integer64))
-
-(define swapSBE64 (foreign-lambda integer64 "PHYSFS_swapSBE64" integer64))
-
-(define swapUBE64 (foreign-lambda unsigned-integer64 "PHYSFS_swapUBE64" unsigned-integer64))
-
-(define utf8FromUcs4 (foreign-lambda* scheme-object ((c-string src) (unsigned-integer64 len))
-                                             "C_word *ptr = C_alloc(C_SIZEOF_VECTOR(len));
+              (define utf8FromUcs4 (foreign-lambda* scheme-object ((c-string src) (unsigned-integer64 len))
+                                                    "C_word *ptr = C_alloc(C_SIZEOF_VECTOR(len));
                                               C_word sdst = C_vector(&ptr, len);
                                               PHYSFS_utf8FromUcs4((PHYSFS_uint32 *)C_data_pointer(sdst), src, len);
                                               C_return(sdst);"))
 
-(define utf8ToUcs4 (foreign-lambda* scheme-object ((nonnull-u32vector src) (unsigned-integer64 len))
-                                           "C_word *ptr = C_alloc(C_SIZEOF_VECTOR(len));
+              (define utf8ToUcs4 (foreign-lambda* scheme-object ((nonnull-u32vector src) (unsigned-integer64 len))
+                                                  "C_word *ptr = C_alloc(C_SIZEOF_VECTOR(len));
                                               C_word sdst = C_vector(&ptr, len);
                                               PHYSFS_utf8ToUcs4((const char *)C_data_pointer(sdst), src, len);
                                               C_return(sdst);"))
 
-(define utf8FromUcs2 (foreign-lambda* c-string* ((nonnull-u16vector src) (unsigned-integer64 len))
-                                             "char *dst = (char *)C_alloc(len);
+              (define utf8FromUcs2 (foreign-lambda* c-string* ((nonnull-u16vector src) (unsigned-integer64 len))
+                                                    "char *dst = (char *)C_alloc(len);
                                               PHYSFS_utf8FromUcs2(src, dst, len);;
                                               C_return(dst);"))
 
-(define utf8ToUcs2 (foreign-lambda* scheme-object ((nonnull-u16vector src) (unsigned-integer64 len))
-                                           "C_word *ptr = C_alloc(C_SIZEOF_VECTOR(len));
+              (define utf8ToUcs2 (foreign-lambda* scheme-object ((nonnull-u16vector src) (unsigned-integer64 len))
+                                                  "C_word *ptr = C_alloc(C_SIZEOF_VECTOR(len));
                                               C_word sdst = C_vector(&ptr, len);
                                               PHYSFS_utf8ToUcs2((const char *)C_data_pointer(sdst), src, len);
                                               C_return(sdst);"))
 
-(define utf8FromLatin1 (foreign-lambda* c-string* ((blob src) (unsigned-integer64 len))
-                                               "char *dst = (char *)C_alloc(sizeof(char) * len);
+              (define utf8FromLatin1 (foreign-lambda* c-string* ((blob src) (unsigned-integer64 len))
+                                                      "char *dst = (char *)C_alloc(sizeof(char) * len);
                                               PHYSFS_utf8FromLatin1((char *)src, dst, len);;
                                               C_return(dst);"))
+
+              (define getLastModTime (foreign-lambda integer64 "PHYSFS_getLastModTime" nonnull-c-string))
+
+              (define tell (foreign-lambda integer64 "PHYSFS_tell" (c-pointer File)))
+
+              (define fileLength (foreign-lambda integer64 "PHYSFS_fileLength" (c-pointer File)))
+
+              (define read (foreign-lambda integer64 "PHYSFS_read" (c-pointer File) nonnull-scheme-pointer unsigned-integer32 unsigned-integer32))
+
+              (define write (foreign-lambda integer64 "PHYSFS_write" (c-pointer File) nonnull-scheme-pointer unsigned-integer32 unsigned-integer32))
+
+              (define write-sle64 writeSLE64)
+              (define write-ule64 writeULE64)
+              (define write-sbe64 writeSBE64)
+              (define write-ube64 writeUBE64)
+              (define swap-sle64 swapSLE64)
+              (define swap-ule64 swapULE64)
+              (define swap-sbe64 swapSBE64)
+              (define swap-ube64 swapUBE64)
+              (define utf8-from-ucs4 utf8FromUcs4)
+              (define utf8-to-ucs4 utf8ToUcs4)
+              (define utf8-from-ucs2 utf8FromUcs2)
+              (define utf8-to-ucs2 utf8ToUcs2)
+              (define utf8-from-latin1 utf8FromLatin1)
+              )
+             (else 
+              (define getLastModTime (foreign-lambda integer32 "PHYSFS_getLastModTime" nonnull-c-string))
+
+              (define tell (foreign-lambda integer32 "PHYSFS_tell" (c-pointer File)))
+
+              (define fileLength (foreign-lambda integer32 "PHYSFS_fileLength" (c-pointer File)))
+
+              (define read (foreign-lambda integer32 "PHYSFS_read" (c-pointer File) nonnull-scheme-pointer unsigned-integer32 unsigned-integer32))
+
+              (define write (foreign-lambda integer32 "PHYSFS_write" (c-pointer File) nonnull-scheme-pointer unsigned-integer32 unsigned-integer32))
+              )
+             )
 
 ;;; Scheme style renames for library functions. Here goes!
 (define permit-symbolic-links permitSymbolicLinks)
@@ -430,22 +364,9 @@ ENDC
 (define read-sbe32 readSBE32)
 (define read-ule32 readULE32)
 (define read-ube32 readUBE32)
-(define write-sle64 writeSLE64)
-(define write-ule64 writeULE64)
-(define write-sbe64 writeSBE64)
-(define write-ube64 writeUBE64)
 (define get-last-mod-time getLastModTime)
 (define file-length fileLength)
 (define set-buffer setBuffer)
-(define swap-sle64 swapSLE64)
-(define swap-ule64 swapULE64)
-(define swap-sbe64 swapSBE64)
-(define swap-ube64 swapUBE64)
-(define utf8-from-ucs4 utf8FromUcs4)
-(define utf8-to-ucs4 utf8ToUcs4)
-(define utf8-from-ucs2 utf8FromUcs2)
-(define utf8-to-ucs2 utf8ToUcs2)
-(define utf8-from-latin1 utf8FromLatin1)
 (define archive-info? ArchiveInfo?)
 (define make-archive-info make-ArchiveInfo)
 (define archive-info-author ArchiveInfo-author)
