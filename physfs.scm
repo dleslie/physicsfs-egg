@@ -250,30 +250,30 @@ ENDC
 
               (define swapUBE64 (foreign-lambda unsigned-integer64 "PHYSFS_swapUBE64" unsigned-integer64))
 
-              (define utf8FromUcs4 (foreign-lambda* scheme-object ((c-string src) (unsigned-integer64 len))
-                                                    "C_word *ptr = C_alloc(C_SIZEOF_VECTOR(len));
+              (define utf8FromUcs4 (foreign-primitive scheme-object ((c-string src) (unsigned-integer64 len))
+                                                      "C_word *ptr = C_alloc(C_SIZEOF_VECTOR(len));
                                               C_word sdst = C_vector(&ptr, len);
                                               PHYSFS_utf8FromUcs4((PHYSFS_uint32 *)C_data_pointer(sdst), src, len);
                                               C_return(sdst);"))
 
-              (define utf8ToUcs4 (foreign-lambda* scheme-object ((nonnull-u32vector src) (unsigned-integer64 len))
+              (define utf8ToUcs4 (foreign-primitive scheme-object ((nonnull-u32vector src) (unsigned-integer64 len))
                                                   "C_word *ptr = C_alloc(C_SIZEOF_VECTOR(len));
                                               C_word sdst = C_vector(&ptr, len);
                                               PHYSFS_utf8ToUcs4((const char *)C_data_pointer(sdst), src, len);
                                               C_return(sdst);"))
 
-              (define utf8FromUcs2 (foreign-lambda* c-string* ((nonnull-u16vector src) (unsigned-integer64 len))
+              (define utf8FromUcs2 (foreign-primitive c-string* ((nonnull-u16vector src) (unsigned-integer64 len))
                                                     "char *dst = (char *)C_alloc(len);
                                               PHYSFS_utf8FromUcs2(src, dst, len);;
                                               C_return(dst);"))
 
-              (define utf8ToUcs2 (foreign-lambda* scheme-object ((nonnull-u16vector src) (unsigned-integer64 len))
+              (define utf8ToUcs2 (foreign-primitive scheme-object ((nonnull-u16vector src) (unsigned-integer64 len))
                                                   "C_word *ptr = C_alloc(C_SIZEOF_VECTOR(len));
                                               C_word sdst = C_vector(&ptr, len);
                                               PHYSFS_utf8ToUcs2((const char *)C_data_pointer(sdst), src, len);
                                               C_return(sdst);"))
 
-              (define utf8FromLatin1 (foreign-lambda* c-string* ((blob src) (unsigned-integer64 len))
+              (define utf8FromLatin1 (foreign-primitive c-string* ((blob src) (unsigned-integer64 len))
                                                       "char *dst = (char *)C_alloc(sizeof(char) * len);
                                               PHYSFS_utf8FromLatin1((char *)src, dst, len);;
                                               C_return(dst);"))
